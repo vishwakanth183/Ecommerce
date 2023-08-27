@@ -16,7 +16,7 @@ import MenuDrawer from './menuDrawer';
 export default function Navbar() {
 
     const mediumFont = poppinsMedium.style.fontFamily;
-    const isMobile = useMediaQuery('(min-width:600px)');
+    const isDesktop = useMediaQuery('(min-width:600px)');
 
     // for navigation purpose
     const router = useRouter();
@@ -58,8 +58,8 @@ export default function Navbar() {
 
 
             {
-                isMobile ?
-                    <AppBar color='transparent' sx={{ height: 60 }}>
+                isDesktop ?
+                    <AppBar color='default' sx={{ height: 60 }}>
                         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
 
                             {/* Left view section */}
