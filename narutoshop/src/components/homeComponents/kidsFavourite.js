@@ -23,7 +23,7 @@ export default function KidsFavourite() {
     useEffect(() => {
         setTimeout(() => {
             setShowFavouriteKids(true)
-        }, 10000)
+        }, 3000)
     }, [])
 
     const GrowImageComponet = ({ imgSrc, index }) => {
@@ -49,7 +49,7 @@ export default function KidsFavourite() {
                     :
                     <Stack direction={'row'}>
                         {Array.from({ length: 6 }).map((i, index) => {
-                            return <Paper elevation={3} sx={{ m: 1 }}><Skeleton variant="rectangular" width={200} height={200} animation={'wave'} sx={{ backgroundColor: colors.deepPurple[100] }} /></Paper>
+                            return <Paper key={index} elevation={3} sx={{ m: 1 }}><Skeleton variant="rectangular" width={200} height={200} animation={'wave'} sx={{ backgroundColor: colors.deepPurple[100] }} /></Paper>
                         })}
                     </Stack>
                 }

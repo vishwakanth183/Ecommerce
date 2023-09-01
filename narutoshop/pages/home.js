@@ -49,10 +49,10 @@ function Home(props) {
             </Stack>
 
             {/* Travel section */}
-            <HeaderTypography variant='h5' sx={{ mt: 10 }} gutterBottom># Travel Books</HeaderTypography>
+            {/* <HeaderTypography variant='h5' sx={{ mt: 10 }} gutterBottom># Travel Books</HeaderTypography>
             <Stack>
                 <KidsFavourite />
-            </Stack>
+            </Stack> */}
         </Box>
     );
 }
