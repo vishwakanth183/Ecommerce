@@ -1,16 +1,17 @@
 import React from 'react'
-import { AppBar, Box, IconButton, Stack, Toolbar, Typography, Button, useMediaQuery } from '@mui/material'
+import { AppBar, Box, IconButton, Stack, Toolbar, Typography, Button, useMediaQuery, Badge } from '@mui/material'
 import TipsAndUpdatesRoundedIcon from '@mui/icons-material/TipsAndUpdatesRounded';
 import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import BubbleChartRoundedIcon from '@mui/icons-material/BubbleChartRounded';
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 
 // custom imports
-import { poppinsMedium } from '../shared/appfonts';
+import { poppinsBold, poppinsMedium } from '../shared/appfonts';
 import MenuDrawer from './menuDrawer';
 
 export default function Navbar() {
@@ -43,6 +44,12 @@ export default function Navbar() {
             route: '/signin',
             startIcon: () => { return <PersonRoundedIcon fontSize='large' /> },
             variant: 'contained'
+        },
+        {
+            name: 'Cart',
+            route: '/cart',
+            isIconButton: true,
+            startIcon: () => { return <ShoppingBasketIcon fontSize='large' /> },
         }
     ]
 
@@ -75,19 +82,25 @@ export default function Navbar() {
                                 {
                                     navBarPages.map((pages, index) => {
                                         return <Link href={pages.route} key={index}>
-                                            <Button variant={pages.variant ? pages.variant : "text"} color="secondary" sx={{ mr: 2, fontFamily: mediumFont }} startIcon={pages.startIcon()} onClick={() => handleRoute(pages.route)}>
-                                                {pages.name}
-                                            </Button>
+                                            {pages.isIconButton ?
+
+                                                <IconButton aria-label="cartIcon" color='secondary'>
+                                                    <Badge badgeContent={4} sx={{fontFamily : poppinsMedium.style.fontStyle}} color='warning'>
+                                                        {pages.startIcon()}
+                                                    </Badge>
+                                                </IconButton>
+                                                : <Button variant={pages.variant ? pages.variant : "text"} color="secondary" sx={{ mr: 2, fontFamily: mediumFont }} startIcon={pages.startIcon()} onClick={() => handleRoute(pages.route)}>
+                                                    {pages.name}
+                                                </Button>}
                                         </Link>
                                     })
                                 }
                             </Stack>
-
                         </Toolbar>
                     </AppBar>
                     :
                     <MenuDrawer />
             }
-        </Box>
+        </Box >
     )
 }

@@ -24,7 +24,7 @@ export default function Home() {
       <div className={styles.splashAnim}>
         <Stack display={'flex'} direction={'row'} alignItems={'center'} justifyContent={'center'}>
           <TipsAndUpdatesRoundedIcon sx={{ height: 150, width: 150, mr: 3 }} color='secondary' />
-          <Typography variant="h1" color="initial" sx={{ fontFamily: poppinsBold.style.fontFamily }}>
+          <Typography variant="h1" color="initial" sx={{ fontFamily: poppinsBold.style.fontFamily , color:'black' }}>
             Vbooks
           </Typography>
         </Stack>
