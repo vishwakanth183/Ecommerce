@@ -1,42 +1,44 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import Image from 'next/image';
-import { VariableSizeList as List } from 'react-window'; // Import VariableSizeList
-import Grid from '@mui/material/Grid';
+import React, { useEffect, useState } from "react";
+import Image from 'next/image'
+import { FixedSizeList as List } from 'react-window'
+import InfiniteLoader from 'react-window-infinite-loader'
 import Paper from '@mui/material/Paper';
-import Skeleton from '@mui/material/Skeleton';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Grid, Stack, Typography } from '@mui/material';
 
+// Custom imports
 import { poppinsBold } from '../../shared/appfonts';
 
+// Variables used for infinite virtualized list
 const PAGE_SIZE = 20;
 const TOTAL_PRODUCTS = 1000;
 const LOAD_THRESHOLD = 200;
+const itemSize = (index) => 300;
 
 const HorizontalProductList = () => {
-    const [products, setProducts] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const containerRef = useRef();
+    const [products, setProducts] = useState([]); //State to maintain product list data
+    const [isLoading, setIsLoading] = useState(false); //State to maintain loading state while fetching products from server
+    const [currentPage, setCurrentPage] = useState(1); //State to maintain current page record
 
-    const itemSize = (index) => 300; // Fixed width of each item in pixels
-
+    // Custom Title MUI component for UI
     const TitleTypography = styled(Typography)({
         fontFamily: poppinsBold.style.fontFamily,
         color: 'black',
     });
 
+    // Custom Medium MUI component for UI
     const MediumTypography = styled(Typography)({
         fontFamily: poppinsBold.style.fontFamily,
         color: 'black',
     });
 
-    const fetchProducts = async () => {
+    // Function used to fetch products from server
+    const fetchProducts = async (pageNumber = currentPage) => {
         setIsLoading(true);
         try {
             const response = await axios.get(
-                `http://localhost:5000/products?_page=${currentPage}&_limit=${PAGE_SIZE}`
+                `http://localhost:5000/products?_page=${pageNumber}&_limit=${PAGE_SIZE}`
             );
             const newProducts = response.data;
             setProducts([...products, ...newProducts]);
@@ -48,39 +50,24 @@ const HorizontalProductList = () => {
         }
     };
 
+    // Function used to load more product items to infinite list
+    const loadMoreItems = async () => {
+        if (!isLoading) {
+            console.log("currentPage", currentPage);
+            if (products.length < TOTAL_PRODUCTS) {
+                setIsLoading(true);
+                setCurrentPage(currentPage + 1);
+                fetchProducts(currentPage);
+            }
+            else {
+                setIsLoading(false)
+            }
+        }
+    }
+
     useEffect(() => {
         fetchProducts();
     }, []); // Fetch initial data
-
-    const handleScroll = useCallback(() => {
-        if (!isLoading && containerRef.current) {
-            const container = containerRef.current;
-            const isNearEnd =
-                container.scrollLeft + container.clientWidth + LOAD_THRESHOLD > container.scrollWidth;
-            console.log("container.scrollLeft", container.scrollLeft);
-            console.log("container.clientWidth", container.clientWidth);
-            console.log("container.scrollWidth", container.scrollWidth);
-            console.log("isNearEnd", isNearEnd);
-            if (false) {
-                fetchProducts();
-            }
-        }
-    }, [isLoading]);
-
-    const renderSkeletonItem = () => {
-        return (
-            <div>
-                <Grid item xs={1} md={2} lg={3}>
-                    <Paper>
-                        <Skeleton variant="rectangular" width={300} height={200} />
-                        <Skeleton variant="text" width={200} />
-                        <Skeleton variant="text" width={150} />
-                        <Skeleton variant="text" width={80} />
-                    </Paper>
-                </Grid>
-            </div>
-        );
-    };
 
     const renderItem = ({ index, style }) => {
         // console.log("index", products[index])
@@ -92,8 +79,8 @@ const HorizontalProductList = () => {
         }
 
         return (
-            <div style={style} key={product.id}>
-                <Grid item xs={1} md={2} lg={3}>
+            <Grid lg={3}>
+                <div style={style} key={product.id}>
                     <Paper sx={{ m: 3 }} elevation={3}>
                         <Stack display={'flex'} direction={'row'}>
                             <Image
@@ -117,30 +104,38 @@ const HorizontalProductList = () => {
                             </Box>
                         </Stack>
                     </Paper>
-                </Grid>
-            </div>
+                </div>
+            </Grid>
         );
     };
 
+
     return (
-        <div
-            className="scroll-container" // Add a CSS class for horizontal scrolling
-            ref={containerRef}
-        >
-            <div style={{ display: 'flex', overflowX: 'auto' }}>
-                <List
-                    height={200} // Specify the height of the list
-                    width={typeof window !== 'undefined' ? window.innerWidth : 0} // Check for window object
-                    itemCount={products.length + PAGE_SIZE} // Use products.length + PAGE_SIZE
-                    itemSize={itemSize} // Width of each item
-                    layout="horizontal" // Specify horizontal layout
-                    onScroll={handleScroll}
+        <Box>
+            <Grid container direction={'row'}>
+                <InfiniteLoader
+                    isItemLoaded={() => isLoading}
+                    itemCount={TOTAL_PRODUCTS}
+                    loadMoreItems={loadMoreItems}
                 >
-                    {renderItem}
-                </List>
-            </div>
-        </div>
-    );
-};
+                    {({ onItemsRendered, ref }) => (
+                        <List
+                            height={window.innerHeight}
+                            width={'100%'} // Check for window object
+                            itemSize={200}
+                            itemCount={products.length}
+                            onItemsRendered={onItemsRendered}
+                            ref={ref}
+                        // layout="horizontal"
+                        // {...props}
+                        >
+                            {renderItem}
+                        </List>
+                    )}
+                </InfiniteLoader>
+            </Grid>
+        </Box>
+    )
+}
 
 export default HorizontalProductList;
